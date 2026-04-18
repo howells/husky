@@ -1,0 +1,21 @@
+{
+  "name": "@howells/husky",
+  "version": "0.1.0",
+  "description": "Standardised git hooks for Howells projects. Immutable pre-commit and pre-push configuration.",
+  "license": "MIT",
+  "files": [
+    "bin/*.mjs",
+    "hooks/*",
+    "README.md"
+  ],
+  "bin": {
+    "howells-husky": "bin/howells-husky.mjs"
+  },
+  "dependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  },
+  "exports": {
+    "./package.json": "./package.json"
+  }
+}
