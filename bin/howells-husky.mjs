@@ -23,6 +23,24 @@ import { fileURLToPath } from "node:url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const packageRoot = resolve(__dirname, "..");
 const projectRoot = process.cwd();
+const lintStagedFormatterCommands = ["howells-format", "howells-ox-fix"];
+const recommendedLintStagedCommand = "howells-ox-fix";
+
+function lintStagedCommandValues(config) {
+  return Object.values(config).flatMap((value) => {
+    if (typeof value === "string") {
+      return [value];
+    }
+    if (Array.isArray(value)) {
+      return value.filter((item) => typeof item === "string");
+    }
+    return [];
+  });
+}
+
+function usesSupportedFormatter(command) {
+  return lintStagedFormatterCommands.some((formatter) => command.includes(formatter));
+}
 
 // Skip in CI environments — hooks aren't needed there
 if (process.env.CI === "true" || process.env.VERCEL === "1") {
@@ -82,23 +100,21 @@ if (existsSync(packageJsonPath)) {
       '[@howells/husky] Warning: no "lint-staged" config found in package.json.',
     );
     console.warn(
-      '  Add: "lint-staged": { "*.{js,ts,jsx,tsx,json,jsonc,css}": "howells-format" }',
+      `  Add: "lint-staged": { "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}" }`,
     );
   }
 
-  // Check that the lint-staged command uses howells-format
+  // Check that the lint-staged command uses a supported Howells formatter.
   const lsConfig = packageJson["lint-staged"];
   if (lsConfig) {
-    const commands = Object.values(lsConfig);
-    const usesHowells = commands.some(
-      (cmd) => typeof cmd === "string" && cmd.includes("howells-format"),
-    );
+    const commands = lintStagedCommandValues(lsConfig);
+    const usesHowells = commands.some(usesSupportedFormatter);
     if (!usesHowells) {
       console.warn(
-        "[@howells/husky] Warning: lint-staged should use howells-format.",
+        "[@howells/husky] Warning: lint-staged should use a supported Howells formatter.",
       );
       console.warn(
-        '  Expected: "*.{js,ts,jsx,tsx,json,jsonc,css}": "howells-format"',
+        `  Expected: "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}"`,
       );
     }
   }
