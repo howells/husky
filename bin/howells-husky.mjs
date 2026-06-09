@@ -16,11 +16,17 @@
  */
 
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, chmodSync } from "node:fs";
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  chmodSync,
+} from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const __dirname = import.meta.dirname;
 const packageRoot = resolve(__dirname, "..");
 const projectRoot = process.cwd();
 const lintStagedFormatterCommands = ["howells-format", "howells-ox-fix"];
@@ -39,7 +45,9 @@ function lintStagedCommandValues(config) {
 }
 
 function usesSupportedFormatter(command) {
-  return lintStagedFormatterCommands.some((formatter) => command.includes(formatter));
+  return lintStagedFormatterCommands.some((formatter) =>
+    command.includes(formatter)
+  );
 }
 
 // Skip in CI environments — hooks aren't needed there
@@ -56,19 +64,22 @@ if (!existsSync(join(projectRoot, ".git"))) {
 const huskyBin = resolve(packageRoot, "node_modules", ".bin", "husky");
 const huskyResult = spawnSync(huskyBin, [], {
   cwd: projectRoot,
-  stdio: "inherit",
   env: process.env,
+  stdio: "inherit",
 });
 
 if (huskyResult.error) {
   // Fallback: try resolving husky from the project's node_modules
   const fallbackResult = spawnSync("npx", ["husky"], {
     cwd: projectRoot,
-    stdio: "inherit",
     env: process.env,
+    stdio: "inherit",
   });
 
-  if (fallbackResult.error || (fallbackResult.status !== null && fallbackResult.status !== 0)) {
+  if (
+    fallbackResult.error ||
+    (fallbackResult.status !== null && fallbackResult.status !== 0)
+  ) {
     console.error("[@howells/husky] Failed to initialise husky");
     process.exit(1);
   }
@@ -93,14 +104,14 @@ for (const hook of hooks) {
 // Step 3: Validate lint-staged config
 const packageJsonPath = join(projectRoot, "package.json");
 if (existsSync(packageJsonPath)) {
-  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
 
   if (!packageJson["lint-staged"]) {
     console.warn(
-      '[@howells/husky] Warning: no "lint-staged" config found in package.json.',
+      '[@howells/husky] Warning: no "lint-staged" config found in package.json.'
     );
     console.warn(
-      `  Add: "lint-staged": { "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}" }`,
+      `  Add: "lint-staged": { "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}" }`
     );
   }
 
@@ -111,10 +122,10 @@ if (existsSync(packageJsonPath)) {
     const usesHowells = commands.some(usesSupportedFormatter);
     if (!usesHowells) {
       console.warn(
-        "[@howells/husky] Warning: lint-staged should use a supported Howells formatter.",
+        "[@howells/husky] Warning: lint-staged should use a supported Howells formatter."
       );
       console.warn(
-        `  Expected: "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}"`,
+        `  Expected: "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}"`
       );
     }
   }
@@ -123,12 +134,12 @@ if (existsSync(packageJsonPath)) {
   const scripts = packageJson.scripts || {};
   if (!scripts.typecheck) {
     console.warn(
-      '[@howells/husky] Warning: no "typecheck" script found. Pre-push hook requires it.',
+      '[@howells/husky] Warning: no "typecheck" script found. Pre-push hook requires it.'
     );
   }
   if (!scripts.lint) {
     console.warn(
-      '[@howells/husky] Warning: no "lint" script found. Pre-push hook requires it.',
+      '[@howells/husky] Warning: no "lint" script found. Pre-push hook requires it.'
     );
   }
 }
