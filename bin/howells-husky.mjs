@@ -29,8 +29,15 @@ import { fileURLToPath } from "node:url";
 const __dirname = import.meta.dirname;
 const packageRoot = resolve(__dirname, "..");
 const projectRoot = process.cwd();
-const lintStagedFormatterCommands = ["howells-format", "howells-ox-fix"];
-const recommendedLintStagedCommand = "howells-ox-fix";
+// `howells-fix` is the current canonical @howells/lint fixer; `howells-ox-fix`
+// and `howells-format` are earlier names still in use by repos mid-migration.
+// Accept all three so a correct lint-staged config never draws a false warning.
+const lintStagedFormatterCommands = [
+  "howells-fix",
+  "howells-ox-fix",
+  "howells-format",
+];
+const recommendedLintStagedCommand = "howells-fix";
 
 function lintStagedCommandValues(config) {
   return Object.values(config).flatMap((value) => {
