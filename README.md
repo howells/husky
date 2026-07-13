@@ -18,7 +18,7 @@ In `package.json`:
     "prepare": "howells-husky"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx,json,jsonc,css}": "howells-ox-fix"
+    "*.{js,ts,jsx,tsx,json,jsonc,css}": "howells-fix"
   }
 }
 ```
@@ -29,9 +29,7 @@ That's it. On `pnpm install`, the hooks are installed automatically.
 
 ### Pre-commit
 
-Runs `pnpm lint-staged` — formats staged files with the configured Howells formatter.
-Use `howells-ox-fix` for projects on the Ox lint path. `howells-format` remains supported
-for older projects.
+Runs `pnpm lint-staged` — formats staged files with the configured Howells formatter. Use `howells-fix`. The older names `howells-ox-fix` and `howells-format` are still accepted (legacy) for projects mid-migration.
 
 ### Pre-push
 
@@ -43,7 +41,7 @@ Your `package.json` must have:
 
 - `"typecheck"` script (e.g. `tsc --noEmit` or `turbo run typecheck`)
 - `"lint"` script (e.g. `howells-lint` or `turbo run lint`)
-- `"lint-staged"` config using `howells-ox-fix` or `howells-format`
+- `"lint-staged"` config using `howells-fix` (`howells-ox-fix` and `howells-format` still accepted, legacy)
 
 ## Why a package?
 

@@ -57,4 +57,34 @@ export default {
   rules: {
     ...legacyCompatibilityRules,
   },
+  overrides: [
+    {
+      // The install-time bin and its co-located tests are untyped .mjs. The
+      // type-aware rules below can only ever fire as false positives against
+      // JS the type checker sees as `any`, so they are disabled here by
+      // explicit rule ID (never a wildcard). The two `off`s that are not
+      // type-noise — no-restricted-properties (process.env reads) and
+      // no-os-command-from-path (the `npx husky` fallback) — are legitimate in
+      // a ~150-line installer and not worth an env-schema/abstraction.
+      files: ["bin/**/*.mjs"],
+      rules: {
+        "typescript/no-unsafe-argument": "off",
+        "typescript/no-unsafe-assignment": "off",
+        "typescript/no-unsafe-call": "off",
+        "typescript/no-unsafe-member-access": "off",
+        "typescript/no-unsafe-return": "off",
+        "typescript/strict-boolean-expressions": "off",
+        // Another type-aware rule that only ever fires against the untyped
+        // `any` view of this JS; the installer deliberately keeps its `||`
+        // guards, whose behaviour is identical here.
+        "typescript/prefer-nullish-coalescing": "off",
+        "eslint/no-restricted-properties": "off",
+        "sonarjs/no-os-command-from-path": "off",
+        // The co-located tests use node:test + node:assert (matching the
+        // @howells/lint test harness), not vitest — this rule is a false
+        // positive for that deliberate, zero-dependency choice.
+        "vitest/no-import-node-test": "off",
+      },
+    },
+  ],
 };

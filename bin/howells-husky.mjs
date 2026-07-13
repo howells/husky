@@ -23,39 +23,19 @@ import {
   readFileSync,
   chmodSync,
 } from "node:fs";
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import path from "node:path";
 
-const __dirname = import.meta.dirname;
-const packageRoot = resolve(__dirname, "..");
+import {
+  fallbackFailed,
+  lintStagedCommandValues,
+  recommendedLintStagedCommand,
+  shouldUseNpxFallback,
+  usesSupportedFormatter,
+} from "./detect.mjs";
+
+const scriptDir = import.meta.dirname;
+const packageRoot = path.resolve(scriptDir, "..");
 const projectRoot = process.cwd();
-// `howells-fix` is the current canonical @howells/lint fixer; `howells-ox-fix`
-// and `howells-format` are earlier names still in use by repos mid-migration.
-// Accept all three so a correct lint-staged config never draws a false warning.
-const lintStagedFormatterCommands = [
-  "howells-fix",
-  "howells-ox-fix",
-  "howells-format",
-];
-const recommendedLintStagedCommand = "howells-fix";
-
-function lintStagedCommandValues(config) {
-  return Object.values(config).flatMap((value) => {
-    if (typeof value === "string") {
-      return [value];
-    }
-    if (Array.isArray(value)) {
-      return value.filter((item) => typeof item === "string");
-    }
-    return [];
-  });
-}
-
-function usesSupportedFormatter(command) {
-  return lintStagedFormatterCommands.some((formatter) =>
-    command.includes(formatter)
-  );
-}
 
 // Skip in CI environments — hooks aren't needed there
 if (process.env.CI === "true" || process.env.VERCEL === "1") {
@@ -63,19 +43,19 @@ if (process.env.CI === "true" || process.env.VERCEL === "1") {
 }
 
 // Skip if not in a git repo (e.g. during npm pack)
-if (!existsSync(join(projectRoot, ".git"))) {
+if (!existsSync(path.join(projectRoot, ".git"))) {
   process.exit(0);
 }
 
 // Step 1: Run husky to initialise .husky/ directory
-const huskyBin = resolve(packageRoot, "node_modules", ".bin", "husky");
+const huskyBin = path.resolve(packageRoot, "node_modules", ".bin", "husky");
 const huskyResult = spawnSync(huskyBin, [], {
   cwd: projectRoot,
   env: process.env,
   stdio: "inherit",
 });
 
-if (huskyResult.error) {
+if (shouldUseNpxFallback(huskyResult)) {
   // Fallback: try resolving husky from the project's node_modules
   const fallbackResult = spawnSync("npx", ["husky"], {
     cwd: projectRoot,
@@ -83,33 +63,30 @@ if (huskyResult.error) {
     stdio: "inherit",
   });
 
-  if (
-    fallbackResult.error ||
-    (fallbackResult.status !== null && fallbackResult.status !== 0)
-  ) {
+  if (fallbackFailed(fallbackResult)) {
     console.error("[@howells/husky] Failed to initialise husky");
     process.exit(1);
   }
 }
 
 // Step 2: Copy canonical hook scripts
-const huskyDir = join(projectRoot, ".husky");
+const huskyDir = path.join(projectRoot, ".husky");
 if (!existsSync(huskyDir)) {
   mkdirSync(huskyDir, { recursive: true });
 }
 
 const hooks = ["pre-commit", "pre-push"];
-const hooksDir = join(packageRoot, "hooks");
+const hooksDir = path.join(packageRoot, "hooks");
 
 for (const hook of hooks) {
-  const source = join(hooksDir, hook);
-  const dest = join(huskyDir, hook);
+  const source = path.join(hooksDir, hook);
+  const dest = path.join(huskyDir, hook);
   copyFileSync(source, dest);
   chmodSync(dest, 0o755);
 }
 
 // Step 3: Validate lint-staged config
-const packageJsonPath = join(projectRoot, "package.json");
+const packageJsonPath = path.join(projectRoot, "package.json");
 if (existsSync(packageJsonPath)) {
   const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
 
