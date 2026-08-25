@@ -78,11 +78,35 @@ if (!existsSync(huskyDir)) {
 const hooks = ["pre-commit", "pre-push"];
 const hooksDir = path.join(packageRoot, "hooks");
 
+// The overwrite is deliberate: the hooks are the package's, not the project's,
+// so a weakened gate cannot survive an install. What was missing is that it
+// happened in silence — a customised hook vanished on the next `pnpm install`
+// with nothing said, so the author believed their change was in effect until
+// it demonstrably was not. Replacing is still unconditional; it is now audible.
 for (const hook of hooks) {
   const source = path.join(hooksDir, hook);
   const dest = path.join(huskyDir, hook);
+
+  let replacedLocalEdit = false;
+  if (existsSync(dest)) {
+    replacedLocalEdit =
+      readFileSync(dest, "utf-8") !== readFileSync(source, "utf-8");
+  }
+
   copyFileSync(source, dest);
   chmodSync(dest, 0o755);
+
+  if (replacedLocalEdit) {
+    console.warn(
+      `[@howells/husky] Replaced .husky/${hook} with the packaged version; your local edits to it are gone.`
+    );
+    console.warn(
+      "  These hooks are intentionally immutable, so a repo cannot weaken its own gate."
+    );
+    console.warn(
+      "  Change them in @howells/husky and publish, or the next install reverts you again."
+    );
+  }
 }
 
 // Step 3: Validate lint-staged config

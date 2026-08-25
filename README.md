@@ -35,6 +35,25 @@ Runs `pnpm lint-staged` — formats staged files with the configured Howells for
 
 Runs `pnpm typecheck` and `pnpm lint`. Both must pass before code reaches the remote.
 
+Both run against the **working directory**, so their result only describes what is being pushed when the working directory is what is being pushed. Git names the refs on stdin, so the hook can tell:
+
+| What you are pushing | What happens |
+| --- | --- |
+| The commit you have checked out | Typecheck and lint run. A failure blocks the push. |
+| A ref that is not `HEAD` | Skipped, and said out loud. The checks would describe a different tree. |
+| A branch deletion | Ignored; nothing is being added to check. |
+| Nothing on stdin | Checked anyway. An unverified push is what this hook exists to stop. |
+
+**Why a non-`HEAD` push is skipped rather than failed.** It is neither a pass nor a failure - it is unverifiable, and reporting the wrong tree's result is worse than admitting the hook cannot see. The case this matters for is the rescue path: work that exists in one place, in a tree that does not typecheck, is exactly what most needs pushing. The old behaviour failed that push for a reason unrelated to what was being pushed, leaving `--no-verify` as the only route - which disables every gate at once.
+
+### The hooks are immutable, and now they say so
+
+`.husky/pre-commit` and `.husky/pre-push` are overwritten from this package on every install. That is deliberate: a repo cannot weaken its own gate to get something to pass.
+
+What changed is that it is no longer silent. If an install replaces a hook whose contents differ from the packaged one, it says so and names the file. Before, a customised hook vanished on the next `pnpm install` with nothing printed, so whoever wrote it believed it was in effect until it demonstrably was not.
+
+**To change a hook, change it here and publish.** There is no per-repo override, by design.
+
 ## Requirements
 
 Your `package.json` must have:
