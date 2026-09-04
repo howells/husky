@@ -4,59 +4,11 @@ import { test } from "node:test";
 import {
   fallbackFailed,
   findLintStagedConfigFile,
-  lintStagedCommandValues,
   recommendedLintStagedCommand,
   shouldUseNpxFallback,
-  usesSupportedFormatter,
 } from "./detect.mjs";
 
-const GLOB = "*.{js,ts,jsx,tsx,json,jsonc,css}";
 const FIX = "howells-fix";
-
-/**
- * Mirror of the real detection path in howells-husky.mjs: flatten a
- * lint-staged config to its command strings, then check any of them uses a
- * supported Howells formatter.
- */
-function configUsesSupportedFormatter(config) {
-  return lintStagedCommandValues(config).some(usesSupportedFormatter);
-}
-
-// --- Regression: the exact bug that shipped as 0.1.1 -----------------------
-
-test("accepts a lint-staged config using howells-fix", () => {
-  assert.equal(configUsesSupportedFormatter({ [GLOB]: FIX }), true);
-});
-
-test("accepts a lint-staged config using howells-ox-fix (legacy)", () => {
-  assert.equal(
-    configUsesSupportedFormatter({ [GLOB]: "howells-ox-fix" }),
-    true
-  );
-});
-
-test("accepts a lint-staged config using howells-format (legacy)", () => {
-  assert.equal(
-    configUsesSupportedFormatter({ [GLOB]: "howells-format" }),
-    true
-  );
-});
-
-test("accepts an array-valued command that includes a formatter", () => {
-  const config = { [GLOB]: [FIX, "some-other-step"] };
-  assert.equal(configUsesSupportedFormatter(config), true);
-});
-
-test("rejects an unsupported formatter (prettier)", () => {
-  assert.equal(
-    configUsesSupportedFormatter({ [GLOB]: "prettier --write" }),
-    false
-  );
-});
-
-test("rejects a config with no formatter command", () => {
-  assert.equal(configUsesSupportedFormatter({ "*.md": "markdownlint" }), false);
-});
 
 test("recommendedLintStagedCommand is howells-fix", () => {
   assert.equal(recommendedLintStagedCommand, FIX);
@@ -76,8 +28,6 @@ test("reports no external lint-staged configuration when none exists", () => {
     undefined
   );
 });
-
-// --- npx-fallback decision logic (task 5) ----------------------------------
 
 test("shouldUseNpxFallback is true only when the primary spawn errored", () => {
   assert.equal(shouldUseNpxFallback({ error: new Error("ENOENT") }), true);

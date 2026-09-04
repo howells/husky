@@ -63,7 +63,7 @@ Your `package.json` must have:
 - a `"prepush"` script appropriate to the repository, or both:
   - a `"typecheck"` script (e.g. `tsc --noEmit` or `turbo run typecheck`)
   - a `"lint"` script (e.g. `howells-lint` or `turbo run lint`)
-- inline or standard external lint-staged configuration; static inline commands use `howells-fix` (`howells-ox-fix` and `howells-format` remain accepted for projects mid-migration)
+- inline or standard external lint-staged configuration appropriate to the project
 
 ## Why a package?
 
