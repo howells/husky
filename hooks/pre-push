@@ -54,5 +54,9 @@ if [ "$saw_ref" = "0" ]; then
   echo "[@howells/husky] No refs on stdin; checking the working directory."
 fi
 
-pnpm typecheck || exit 1
-pnpm lint || exit 1
+if node -e 'const scripts = require("./package.json").scripts; process.exit(typeof scripts?.prepush === "string" ? 0 : 1)'; then
+  pnpm prepush
+else
+  pnpm typecheck || exit 1
+  pnpm lint || exit 1
+fi
