@@ -23,6 +23,8 @@ In `package.json`:
 }
 ```
 
+Standard external lint-staged configuration files are supported as an alternative to the inline `package.json` entry. Use one when path-aware or computed commands are needed.
+
 That's it. On `pnpm install`, the hooks are installed automatically.
 
 ## What it does
@@ -61,7 +63,7 @@ Your `package.json` must have:
 - a `"prepush"` script appropriate to the repository, or both:
   - a `"typecheck"` script (e.g. `tsc --noEmit` or `turbo run typecheck`)
   - a `"lint"` script (e.g. `howells-lint` or `turbo run lint`)
-- `"lint-staged"` config using `howells-fix` (`howells-ox-fix` and `howells-format` still accepted, legacy)
+- inline or standard external lint-staged configuration; static inline commands use `howells-fix` (`howells-ox-fix` and `howells-format` remain accepted for projects mid-migration)
 
 ## Why a package?
 

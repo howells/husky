@@ -16,6 +16,27 @@ export const lintStagedFormatterCommands = [
 
 export const recommendedLintStagedCommand = "howells-fix";
 
+// Standard configuration names supported by lint-staged. Package-level files
+// in a monorepo are discovered by lint-staged itself; the installer only needs
+// to recognise the root configuration it is responsible for validating.
+export const lintStagedConfigFileNames = [
+  ".lintstagedrc",
+  ".lintstagedrc.json",
+  ".lintstagedrc.yaml",
+  ".lintstagedrc.yml",
+  ".lintstagedrc.js",
+  ".lintstagedrc.mjs",
+  ".lintstagedrc.cjs",
+  "lint-staged.config.js",
+  "lint-staged.config.mjs",
+  "lint-staged.config.cjs",
+  "lint-staged.config.ts",
+];
+
+export function findLintStagedConfigFile(exists) {
+  return lintStagedConfigFileNames.find((file) => exists(file));
+}
+
 /**
  * Flatten a lint-staged config object into the list of command strings it runs.
  * Values may be a single command string or an array of them.
