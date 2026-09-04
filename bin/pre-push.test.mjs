@@ -34,6 +34,10 @@ function stubPnpm(code) {
   chmodSync(path.join(repo, "bin", "pnpm"), 0o755);
 }
 
+function writeProjectScripts(scripts) {
+  writeFileSync(path.join(repo, "package.json"), JSON.stringify({ scripts }));
+}
+
 /** Run the hook with `stdin` and return {status, out}. */
 function run(stdin) {
   const result = spawnSync("sh", [HOOK], {
@@ -57,6 +61,7 @@ describe("pre-push", () => {
     git("init", "-q", ".");
     git("commit", "-q", "--allow-empty", "-m", "init");
     headSha = git("rev-parse", "HEAD").stdout.trim();
+    writeProjectScripts({ lint: "lint", typecheck: "typecheck" });
     stubPnpm(0);
   });
 
@@ -71,6 +76,21 @@ describe("pre-push", () => {
     assert.equal(status, 0);
     assert.match(out, /RAN pnpm typecheck/);
     assert.match(out, /RAN pnpm lint/);
+  });
+
+  it("delegates to a project-owned prepush script when present", () => {
+    writeProjectScripts({ prepush: "node scripts/pre-push-check.mjs" });
+    try {
+      const { out, status } = run(
+        `refs/heads/main ${headSha} refs/heads/main ${ZERO}\n`
+      );
+      assert.equal(status, 0);
+      assert.match(out, /RAN pnpm prepush/);
+      assert.doesNotMatch(out, /RAN pnpm typecheck/);
+      assert.doesNotMatch(out, /RAN pnpm lint/);
+    } finally {
+      writeProjectScripts({ lint: "lint", typecheck: "typecheck" });
+    }
   });
 
   it("skips, and says so, when a pushed sha is not HEAD", () => {

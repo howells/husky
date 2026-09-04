@@ -33,7 +33,7 @@ Runs `pnpm lint-staged` — formats staged files with the configured Howells for
 
 ### Pre-push
 
-Runs `pnpm typecheck` and `pnpm lint`. Both must pass before code reaches the remote.
+Runs the project's `pnpm prepush` script when one exists, so each repository can define the narrowest appropriate gate for its own architecture. Projects without that script retain the backward-compatible `pnpm typecheck` followed by `pnpm lint` fallback. The selected gate must pass before code reaches the remote.
 
 Both run against the **working directory**, so their result only describes what is being pushed when the working directory is what is being pushed. Git names the refs on stdin, so the hook can tell:
 
@@ -58,8 +58,9 @@ What changed is that it is no longer silent. If an install replaces a hook whose
 
 Your `package.json` must have:
 
-- `"typecheck"` script (e.g. `tsc --noEmit` or `turbo run typecheck`)
-- `"lint"` script (e.g. `howells-lint` or `turbo run lint`)
+- a `"prepush"` script appropriate to the repository, or both:
+  - a `"typecheck"` script (e.g. `tsc --noEmit` or `turbo run typecheck`)
+  - a `"lint"` script (e.g. `howells-lint` or `turbo run lint`)
 - `"lint-staged"` config using `howells-fix` (`howells-ox-fix` and `howells-format` still accepted, legacy)
 
 ## Why a package?

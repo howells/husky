@@ -38,7 +38,11 @@ const packageRoot = path.resolve(scriptDir, "..");
 const projectRoot = process.cwd();
 
 // Skip in CI environments — hooks aren't needed there
-if (process.env.CI === "true" || process.env.VERCEL === "1") {
+if (
+  process.env.HUSKY === "0" ||
+  process.env.CI === "true" ||
+  process.env.VERCEL === "1"
+) {
   process.exit(0);
 }
 
@@ -138,16 +142,17 @@ if (existsSync(packageJsonPath)) {
     }
   }
 
-  // Check that typecheck and lint scripts exist
+  // Projects can own an appropriately scoped pre-push gate. Older projects
+  // retain the package's typecheck + lint fallback until they add one.
   const scripts = packageJson.scripts || {};
-  if (!scripts.typecheck) {
+  if (!scripts.prepush && !scripts.typecheck) {
     console.warn(
-      '[@howells/husky] Warning: no "typecheck" script found. Pre-push hook requires it.'
+      '[@howells/husky] Warning: no "prepush" or "typecheck" script found. Pre-push hook requires one.'
     );
   }
-  if (!scripts.lint) {
+  if (!scripts.prepush && !scripts.lint) {
     console.warn(
-      '[@howells/husky] Warning: no "lint" script found. Pre-push hook requires it.'
+      '[@howells/husky] Warning: no "prepush" or "lint" script found. Pre-push hook requires one.'
     );
   }
 }
