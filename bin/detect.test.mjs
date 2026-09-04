@@ -3,6 +3,7 @@ import { test } from "node:test";
 
 import {
   fallbackFailed,
+  findLintStagedConfigFile,
   lintStagedCommandValues,
   recommendedLintStagedCommand,
   shouldUseNpxFallback,
@@ -59,6 +60,21 @@ test("rejects a config with no formatter command", () => {
 
 test("recommendedLintStagedCommand is howells-fix", () => {
   assert.equal(recommendedLintStagedCommand, FIX);
+});
+
+test("recognises standard external lint-staged configuration", () => {
+  const files = new Set(["package.json", "lint-staged.config.mjs"]);
+  assert.equal(
+    findLintStagedConfigFile((file) => files.has(file)),
+    "lint-staged.config.mjs"
+  );
+});
+
+test("reports no external lint-staged configuration when none exists", () => {
+  assert.equal(
+    findLintStagedConfigFile(() => false),
+    undefined
+  );
 });
 
 // --- npx-fallback decision logic (task 5) ----------------------------------

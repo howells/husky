@@ -27,6 +27,7 @@ import path from "node:path";
 
 import {
   fallbackFailed,
+  findLintStagedConfigFile,
   lintStagedCommandValues,
   recommendedLintStagedCommand,
   shouldUseNpxFallback,
@@ -117,17 +118,21 @@ for (const hook of hooks) {
 const packageJsonPath = path.join(projectRoot, "package.json");
 if (existsSync(packageJsonPath)) {
   const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
+  const externalLintStagedConfig = findLintStagedConfigFile((file) =>
+    existsSync(path.join(projectRoot, file))
+  );
 
-  if (!packageJson["lint-staged"]) {
+  if (!packageJson["lint-staged"] && !externalLintStagedConfig) {
     console.warn(
-      '[@howells/husky] Warning: no "lint-staged" config found in package.json.'
+      "[@howells/husky] Warning: no inline or external lint-staged config found."
     );
     console.warn(
       `  Add: "lint-staged": { "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}" }`
     );
   }
 
-  // Check that the lint-staged command uses a supported Howells formatter.
+  // Inline static configs can be checked directly. External JavaScript configs
+  // may compute commands dynamically, so lint-staged owns their validation.
   const lsConfig = packageJson["lint-staged"];
   if (lsConfig) {
     const commands = lintStagedCommandValues(lsConfig);
