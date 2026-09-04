@@ -28,10 +28,8 @@ import path from "node:path";
 import {
   fallbackFailed,
   findLintStagedConfigFile,
-  lintStagedCommandValues,
   recommendedLintStagedCommand,
   shouldUseNpxFallback,
-  usesSupportedFormatter,
 } from "./detect.mjs";
 
 const scriptDir = import.meta.dirname;
@@ -129,22 +127,6 @@ if (existsSync(packageJsonPath)) {
     console.warn(
       `  Add: "lint-staged": { "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}" }`
     );
-  }
-
-  // Inline static configs can be checked directly. External JavaScript configs
-  // may compute commands dynamically, so lint-staged owns their validation.
-  const lsConfig = packageJson["lint-staged"];
-  if (lsConfig) {
-    const commands = lintStagedCommandValues(lsConfig);
-    const usesHowells = commands.some(usesSupportedFormatter);
-    if (!usesHowells) {
-      console.warn(
-        "[@howells/husky] Warning: lint-staged should use a supported Howells formatter."
-      );
-      console.warn(
-        `  Expected: "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}"`
-      );
-    }
   }
 
   // Projects can own an appropriately scoped pre-push gate. Older projects
