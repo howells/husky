@@ -25,14 +25,19 @@
     "lint": "howells-check --config=oxlint.config.ts package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
     "lint:fix": "howells-fix --config=oxlint.config.ts package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
     "format": "howells-oxfmt --write package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
-    "test": "node --test bin/detect.test.mjs bin/pre-push.test.mjs"
+    "test": "node --test bin/detect.test.mjs bin/pre-push.test.mjs",
+    "prepush": "pnpm lint && pnpm test",
+    "prepare": "node bin/howells-husky.mjs"
   },
   "dependencies": {
-    "husky": "^9.1.7",
-    "lint-staged": "^16.4.0"
+    "husky": "^9.1.7"
   },
   "devDependencies": {
-    "@howells/lint": "^1.1.0"
+    "@howells/lint": "^1.1.0",
+    "lint-staged": "^16.4.0"
+  },
+  "lint-staged": {
+    "*.{js,mjs,cjs,ts,tsx,json,jsonc,css,md}": "howells-oxfmt --write"
   },
   "engines": {
     "node": ">=24.15.0"
