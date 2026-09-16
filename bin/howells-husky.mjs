@@ -144,4 +144,4 @@ if (existsSync(packageJsonPath)) {
   }
 }
 
-console.log("[@howells/husky] Hooks installed.");
+console.error("[@howells/husky] Hooks installed.");
