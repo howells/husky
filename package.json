@@ -5,7 +5,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/commoninstruments/husky.git"
+    "url": "git+https://github.com/howells/husky.git"
   },
   "bin": {
     "howells-husky": "bin/howells-husky.mjs"
