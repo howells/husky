@@ -1,6 +1,6 @@
 {
   "name": "@howells/husky",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Standardised git hooks for Howells projects. Immutable pre-commit and pre-push configuration.",
   "license": "MIT",
   "repository": {

@@ -29,6 +29,7 @@ import {
   fallbackFailed,
   findLintStagedConfigFile,
   recommendedLintStagedCommand,
+  recommendedLintStagedGlob,
   shouldUseNpxFallback,
 } from "./detect.mjs";
 
@@ -125,7 +126,7 @@ if (existsSync(packageJsonPath)) {
       "[@howells/husky] Warning: no inline or external lint-staged config found."
     );
     console.warn(
-      `  Add: "lint-staged": { "*.{js,ts,jsx,tsx,json,jsonc,css}": "${recommendedLintStagedCommand}" }`
+      `  Add: "lint-staged": { "${recommendedLintStagedGlob}": "${recommendedLintStagedCommand}" }`
     );
   }
 

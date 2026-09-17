@@ -5,7 +5,16 @@
  * around behaviour that is unit-testable in isolation.
  */
 
-export const recommendedLintStagedCommand = "howells-fix";
+// Staging formats and nothing else. `howells-fix` also runs `oxlint --fix`,
+// and four vitest rules that ultracite enables at error severity rewrite test
+// assertions under that tier — `toBe(true)` becomes `toBeTruthy()`, which
+// passes on values the original rejected. Applied on commit that happens
+// silently, inside files the author has already reviewed. Linting belongs in
+// pre-push, where it reports rather than rewrites.
+export const recommendedLintStagedCommand = "howells-oxfmt --write";
+
+export const recommendedLintStagedGlob =
+  "*.{js,ts,jsx,tsx,json,jsonc,css,md,mdx}";
 
 // Standard configuration names supported by lint-staged. Package-level files
 // in a monorepo are discovered by lint-staged itself; the installer only needs

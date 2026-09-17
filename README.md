@@ -18,7 +18,7 @@ In `package.json`:
     "prepare": "howells-husky"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx,json,jsonc,css}": "howells-fix"
+    "*.{js,ts,jsx,tsx,json,jsonc,css,md,mdx}": "howells-oxfmt --write"
   }
 }
 ```
@@ -31,7 +31,20 @@ That's it. On `pnpm install`, the hooks are installed automatically.
 
 ### Pre-commit
 
-Runs `pnpm lint-staged` — formats staged files with the configured Howells formatter. Use `howells-fix`. The older names `howells-ox-fix` and `howells-format` are still accepted (legacy) for projects mid-migration.
+Runs `pnpm lint-staged` — formats staged files with the configured Howells formatter. Use `howells-oxfmt --write`.
+
+**Staging is format-only. Never put `howells-fix` in lint-staged.** Formatting only moves whitespace, so it is safe to apply to a file you are already committing. `howells-fix` also runs `oxlint --fix`, and four rules that ultracite enables at error severity rewrite test assertions under that supposedly safe tier:
+
+| Rule | Rewrites |
+| --- | --- |
+| `vitest/prefer-strict-equal` | `toEqual` → `toStrictEqual` |
+| `vitest/prefer-to-be-truthy` | `toBe(true)` → `toBeTruthy()` |
+| `vitest/prefer-to-be-falsy` | `toBe(false)` → `toBeFalsy()` |
+| `vitest/prefer-describe-function-title` | the string title of a `describe` block |
+
+The first three weaken what the assertion checks: `toBeTruthy()` passes on `1`, `"0"` and `{}`, which `toBe(true)` rejects. Applied on commit, they rewrite tests silently, in files the author already reviewed, and the commit still looks like the diff that was staged. One repository had 121 assertions changed this way before anyone noticed. This is an oxlint defect — `--fix` is documented as the tier that does not change behaviour — but until it is fixed, keep lint out of the commit hook. Pre-push runs the full lint and reports these as findings, which is where they belong.
+
+The older names `howells-ox-fix` and `howells-format` are still accepted (legacy) for projects mid-migration; both format only.
 
 ### Pre-push
 
@@ -63,7 +76,7 @@ Your `package.json` must have:
 - a `"prepush"` script appropriate to the repository, or both:
   - a `"typecheck"` script (e.g. `tsc --noEmit` or `turbo run typecheck`)
   - a `"lint"` script (e.g. `howells-lint` or `turbo run lint`)
-- inline or standard external lint-staged configuration appropriate to the project
+- inline or standard external lint-staged configuration appropriate to the project, running a formatter only
 
 ## Why a package?
 

@@ -5,13 +5,22 @@ import {
   fallbackFailed,
   findLintStagedConfigFile,
   recommendedLintStagedCommand,
+  recommendedLintStagedGlob,
   shouldUseNpxFallback,
 } from "./detect.mjs";
 
-const FIX = "howells-fix";
+test("the recommended staging command formats and does not lint", () => {
+  assert.equal(recommendedLintStagedCommand, "howells-oxfmt --write");
+  // A lint fix in the commit hook rewrites test assertions. Guard the
+  // recommendation against drifting back to one.
+  assert.doesNotMatch(recommendedLintStagedCommand, /fix$|oxlint/);
+});
 
-test("recommendedLintStagedCommand is howells-fix", () => {
-  assert.equal(recommendedLintStagedCommand, FIX);
+test("the recommended glob covers the formattable file types", () => {
+  assert.equal(
+    recommendedLintStagedGlob,
+    "*.{js,ts,jsx,tsx,json,jsonc,css,md,mdx}"
+  );
 });
 
 test("recognises standard external lint-staged configuration", () => {
