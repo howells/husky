@@ -24,10 +24,9 @@
   "scripts": {
     "lint": "howells-check --config=oxlint.config.ts package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
     "lint:fix": "howells-fix --config=oxlint.config.ts package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
-    "format": "howells-oxfmt --write package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
-    "test": "node --test bin/detect.test.mjs bin/pre-push.test.mjs",
+    "prepare": "node bin/howells-husky.mjs",
     "prepush": "pnpm lint && pnpm test",
-    "prepare": "node bin/howells-husky.mjs"
+    "test": "node --test bin/detect.test.mjs bin/pre-push.test.mjs"
   },
   "dependencies": {
     "husky": "^9.1.7"
