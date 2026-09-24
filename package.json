@@ -1,6 +1,6 @@
 {
   "name": "@howells/husky",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Standardised git hooks for Howells projects. Immutable pre-commit and pre-push configuration.",
   "license": "MIT",
   "repository": {
@@ -32,8 +32,8 @@
     "husky": "^9.1.7"
   },
   "devDependencies": {
-    "@howells/lint": "^1.1.0",
-    "lint-staged": "^16.4.0"
+    "@howells/lint": "^3.5.1",
+    "lint-staged": "^17.5.1"
   },
   "lint-staged": {
     "*.{js,mjs,cjs,ts,tsx,json,jsonc,css,md}": "howells-oxfmt --write"
