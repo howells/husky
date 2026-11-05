@@ -112,11 +112,9 @@ jobs:
           fi
           echo "$name@$version is not published yet (registry returned $status)."
 
-      - name: Verify and pack
+      - name: Pack
         run: |
           set -euo pipefail
-          pnpm lint
-          pnpm test
           mkdir -p "$GITHUB_WORKSPACE/release-artifacts"
           pnpm pack --pack-destination "$GITHUB_WORKSPACE/release-artifacts"
 

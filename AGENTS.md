@@ -1,13 +1,12 @@
 # husky
 
-Documentation, specifications, decisions and outstanding work live in Linear (howells, HOW).
+`@howells/husky` installs the pre-commit hook (`pnpm lint-staged` only) into other repos via `prepare`. It installs no pre-push hook.
 
-- [husky — project documentation](https://linear.app/howells/document/husky-project-documentation-94ba32174576)
+Issues and docs live in Linear (howells, HOW).
 
 ```sh
 pnpm lint
 pnpm test
-pnpm prepush
 ```
 
-Read the linked operating rules and domain definitions before editing. Keep one writer per checkout; preserve existing work. Put plans, handoffs and evidence on the owning Linear issue. Do not add local documentation or task reports. Instruments and Ground are the documentation exceptions.
+Release: bump `version` in package.json, commit, push a matching `vX.Y.Z` tag; `release.yml` publishes to npm. Don't overwrite others' uncommitted work.

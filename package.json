@@ -1,7 +1,7 @@
 {
   "name": "@howells/husky",
-  "version": "0.2.6",
-  "description": "Standardised git hooks for Howells projects. Immutable pre-commit and pre-push configuration.",
+  "version": "0.3.0",
+  "description": "Standardised git hooks for Howells projects. Immutable pre-commit configuration.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -25,8 +25,7 @@
     "lint": "howells-check --config=oxlint.config.ts package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
     "lint:fix": "howells-fix --config=oxlint.config.ts package.json bin hooks README.md oxlint.config.ts oxfmt.config.ts",
     "prepare": "node bin/howells-husky.mjs",
-    "prepush": "pnpm lint && pnpm test",
-    "test": "node --test bin/detect.test.mjs bin/pre-push.test.mjs"
+    "test": "node --test bin/detect.test.mjs"
   },
   "dependencies": {
     "husky": "^9.1.7"

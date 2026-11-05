@@ -7,7 +7,7 @@
  *
  * On `pnpm install`, this script:
  *   1. Runs `husky` to initialise the .husky/ directory
- *   2. Copies the canonical pre-commit and pre-push hooks
+ *   2. Copies the canonical pre-commit hook
  *   3. Validates that lint-staged config exists in package.json
  *
  * The hook scripts are immutable — they come from the package,
@@ -79,7 +79,7 @@ if (!existsSync(huskyDir)) {
   mkdirSync(huskyDir, { recursive: true });
 }
 
-const hooks = ["pre-commit", "pre-push"];
+const hooks = ["pre-commit"];
 const hooksDir = path.join(packageRoot, "hooks");
 
 // The overwrite is deliberate: the hooks are the package's, not the project's,
@@ -104,9 +104,7 @@ for (const hook of hooks) {
     console.warn(
       `[@howells/husky] Replaced .husky/${hook} with the packaged version; your local edits to it are gone.`
     );
-    console.warn(
-      "  These hooks are intentionally immutable, so a repo cannot weaken its own gate."
-    );
+    console.warn("  These hooks are intentionally immutable.");
     console.warn(
       "  Change them in @howells/husky and publish, or the next install reverts you again."
     );
@@ -127,20 +125,6 @@ if (existsSync(packageJsonPath)) {
     );
     console.warn(
       `  Add: "lint-staged": { "${recommendedLintStagedGlob}": "${recommendedLintStagedCommand}" }`
-    );
-  }
-
-  // Projects can own an appropriately scoped pre-push gate. Older projects
-  // retain the package's typecheck + lint fallback until they add one.
-  const scripts = packageJson.scripts || {};
-  if (!scripts.prepush && !scripts.typecheck) {
-    console.warn(
-      '[@howells/husky] Warning: no "prepush" or "typecheck" script found. Pre-push hook requires one.'
-    );
-  }
-  if (!scripts.prepush && !scripts.lint) {
-    console.warn(
-      '[@howells/husky] Warning: no "prepush" or "lint" script found. Pre-push hook requires one.'
     );
   }
 }

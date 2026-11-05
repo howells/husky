@@ -9,8 +9,7 @@
 // and four vitest rules that ultracite enables at error severity rewrite test
 // assertions under that tier — `toBe(true)` becomes `toBeTruthy()`, which
 // passes on values the original rejected. Applied on commit that happens
-// silently, inside files the author has already reviewed. Linting belongs in
-// pre-push, where it reports rather than rewrites.
+// silently, inside files the author has already reviewed.
 export const recommendedLintStagedCommand = "howells-oxfmt --write";
 
 export const recommendedLintStagedGlob =
