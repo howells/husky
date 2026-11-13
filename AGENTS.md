@@ -13,7 +13,7 @@ Release: bump `version` in package.json, commit, push a matching `vX.Y.Z` tag; `
 
 ### Issue tracker
 
-Issues live in Linear (howells, HOW). See `docs/agents/issue-tracker.md`.
+Linear, workspace `howells`, team `HOW`. See `~/Sites/home/docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
